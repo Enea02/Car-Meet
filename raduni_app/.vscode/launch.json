@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "raduni_app (dev)",
+      "request": "launch",
+      "type": "dart",
+      "toolArgs": [
+        "--dart-define=SUPABASE_URL=https://dblkwbgkfrugetjlfrfb.supabase.co",
+        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRibGt3YmdrZnJ1Z2V0amxmcmZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxODE5OTgsImV4cCI6MjA5Mzc1Nzk5OH0.xEldtNGzTdIBH3mJGQbsEsrx7ATnLLYtm1wKNVEhxWo"
+      ]
+    }
+  ]
+}

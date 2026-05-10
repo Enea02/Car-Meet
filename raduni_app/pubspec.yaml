@@ -30,9 +30,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # Backend
-  supabase_flutter: ^2.5.0
+  supabase_flutter: ^2.12.4
 
   # State management
   flutter_riverpod: ^2.5.0
@@ -50,9 +52,10 @@ dependencies:
 
   # Image picker per foto auto/raduni
   image_picker: ^1.0.0
+  flutter_image_compress: ^2.3.0
 
   # Utility
-  intl: ^0.19.0
+  intl: ^0.20.2
   cached_network_image: ^3.3.0
 
   # The following adds the Cupertino Icons font to your application.

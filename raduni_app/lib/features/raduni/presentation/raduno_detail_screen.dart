@@ -319,7 +319,7 @@ class _DetailBody extends ConsumerWidget {
       BuildContext context, WidgetRef ref, String id) async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         backgroundColor: AppColors.surface,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -328,10 +328,10 @@ class _DetailBody extends ConsumerWidget {
             const Text('L\'azione non è reversibile.'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context, false),
+              onPressed: () => Navigator.of(dialogCtx).pop(false),
               child: const Text('Annulla')),
           FilledButton.tonal(
-              onPressed: () => Navigator.pop(context, true),
+              onPressed: () => Navigator.of(dialogCtx).pop(true),
               child: const Text('Elimina')),
         ],
       ),
@@ -359,7 +359,7 @@ class _DetailBody extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (_) => SafeArea(
+      builder: (sheetCtx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -380,7 +380,7 @@ class _DetailBody extends ConsumerWidget {
                   leading: const Icon(Icons.directions_car_outlined,
                       color: AppColors.inkMuted),
                   title: Text(auto.displayName),
-                  onTap: () => Navigator.pop(context, auto.id),
+                  onTap: () => Navigator.of(sheetCtx).pop(auto.id),
                 )),
             const SizedBox(height: 8),
           ],

@@ -54,6 +54,26 @@ class RaduniRepository {
         .toList();
   }
 
+  Future<List<Raduno>> fetchAttendedByUser(String userId) async {
+    final attendances = await _client
+        .from('attendances')
+        .select('raduno_id')
+        .eq('user_id', userId);
+    final ids = (attendances as List)
+        .map((a) => a['raduno_id'] as String)
+        .toList();
+    if (ids.isEmpty) return [];
+    final rows = await _client
+        .from('raduni')
+        .select()
+        .inFilter('id', ids)
+        .order('start_at', ascending: false);
+    return (rows as List)
+        .cast<Map<String, dynamic>>()
+        .map(Raduno.fromJson)
+        .toList();
+  }
+
   Future<Raduno> create({
     required String organizerId,
     required String title,

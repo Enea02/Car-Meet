@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -152,13 +153,13 @@ class _ProfileView extends ConsumerWidget {
                   _SettingsTile(
                     icon: Icons.event_outlined,
                     label: 'I miei raduni',
-                    onTap: () {},
+                    onTap: () => context.push('/home/profile/raduni'),
                   ),
                   const Divider(height: 0, indent: 52),
                   _SettingsTile(
                     icon: Icons.settings_outlined,
                     label: 'Impostazioni',
-                    onTap: () {},
+                    onTap: () => context.push('/home/profile/impostazioni'),
                   ),
                   const Divider(height: 0, indent: 52),
                   _SettingsTile(
@@ -194,19 +195,19 @@ class _ProfileView extends ConsumerWidget {
   void _confirmLogout(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         backgroundColor: AppColors.surface,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Esci dall\'account?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.of(dialogCtx).pop(),
             child: const Text('Annulla'),
           ),
           FilledButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.of(dialogCtx).pop();
               ref.read(authRepositoryProvider).signOut();
             },
             style: FilledButton.styleFrom(backgroundColor: AppColors.danger),

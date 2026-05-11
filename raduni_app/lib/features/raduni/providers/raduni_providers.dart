@@ -58,6 +58,18 @@ final attendanceCountProvider =
   return ref.watch(raduniRepositoryProvider).attendanceCount(radunoId);
 });
 
+final myAttendedRaduniProvider = FutureProvider<List<Raduno>>((ref) async {
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == null) return [];
+  return ref.watch(raduniRepositoryProvider).fetchAttendedByUser(userId);
+});
+
+final myOrganizedRaduniProvider = FutureProvider<List<Raduno>>((ref) async {
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == null) return [];
+  return ref.watch(raduniRepositoryProvider).fetchOrganizedBy(userId);
+});
+
 // Count of raduni attended by the current user (for profile stats)
 final myAttendedCountProvider = FutureProvider<int>((ref) async {
   final userId = ref.watch(currentUserIdProvider);

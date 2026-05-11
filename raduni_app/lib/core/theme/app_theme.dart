@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
+import 'theme_provider.dart';
 
 abstract class AppTheme {
-  static ThemeData light() {
+  static ThemeData light([String palette = 'forest']) {
+    final p = accentPalettes[palette] ?? accentPalettes['forest']!;
+    final accent = p.accent;
+
     final base = ThemeData.light(useMaterial3: true);
-    // Inter is the closest available Google Font to Geist
     final textTheme = GoogleFonts.interTextTheme(base.textTheme).apply(
       bodyColor: AppColors.ink,
       displayColor: AppColors.ink,
@@ -14,8 +17,8 @@ abstract class AppTheme {
     return base.copyWith(
       scaffoldBackgroundColor: AppColors.bg,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.accent,
-        primary: AppColors.accent,
+        seedColor: accent,
+        primary: accent,
         surface: AppColors.surface,
         onSurface: AppColors.ink,
         brightness: Brightness.light,
@@ -34,7 +37,7 @@ abstract class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: AppColors.accent,
+          backgroundColor: accent,
           foregroundColor: Colors.white,
           textStyle:
               textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
@@ -53,7 +56,7 @@ abstract class AppTheme {
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: AppColors.accent),
+        style: TextButton.styleFrom(foregroundColor: accent),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -73,8 +76,7 @@ abstract class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide:
-              const BorderSide(color: AppColors.accent, width: 1.5),
+          borderSide: BorderSide(color: accent, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -111,9 +113,8 @@ abstract class AppTheme {
     );
   }
 
-  static ThemeData dark() => light();
+  static ThemeData dark([String palette = 'forest']) => light(palette);
 
-  // Instrument Serif italic — for display numbers ("Ciao, Enea", stat numbers)
   static TextStyle displayNumber({double size = 48, Color? color}) {
     return GoogleFonts.instrumentSerif(
       fontSize: size,
@@ -125,7 +126,6 @@ abstract class AppTheme {
     );
   }
 
-  // JetBrains Mono — for plates, distances, times, technical data
   static TextStyle mono({
     double size = 13,
     Color? color,

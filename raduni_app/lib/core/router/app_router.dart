@@ -12,6 +12,8 @@ import '../../features/auto/presentation/auto_detail_screen.dart';
 import '../../features/auto/presentation/my_garage_screen.dart';
 import '../../features/auto/presentation/register_auto_screen.dart';
 import '../../features/map/presentation/map_screen.dart';
+import '../../features/profile/presentation/impostazioni_screen.dart';
+import '../../features/profile/presentation/miei_raduni_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/raduni/presentation/create_raduno_screen.dart';
 import '../../features/raduni/presentation/home_screen.dart';
@@ -84,6 +86,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/home/profile',
             builder: (_, __) => const ProfileScreen(),
+            routes: [
+              GoRoute(
+                path: 'raduni',
+                parentNavigatorKey: _rootNavKey,
+                builder: (_, __) => const MieiRaduniScreen(),
+              ),
+              GoRoute(
+                path: 'impostazioni',
+                parentNavigatorKey: _rootNavKey,
+                builder: (_, __) => const ImpostazioniScreen(),
+              ),
+            ],
           ),
         ],
       ),

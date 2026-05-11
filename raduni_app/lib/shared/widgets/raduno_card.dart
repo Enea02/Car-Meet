@@ -46,80 +46,77 @@ class RadunoCard extends StatelessWidget {
             ),
             const SizedBox(width: 12),
 
-            // Content
+            // Content — no fixed height, grows with text
             Expanded(
-              child: SizedBox(
-                height: 88,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Date · time · distance
-                    Row(
-                      children: [
-                        Text(
-                          dateFmt.format(raduno.startAt.toLocal()).toUpperCase(),
-                          style: AppTheme.mono(
-                            size: 11,
-                            color: AppColors.accent,
-                            weight: FontWeight.w600,
-                          ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Date · time · distance
+                  Row(
+                    children: [
+                      Text(
+                        dateFmt.format(raduno.startAt.toLocal()).toUpperCase(),
+                        style: AppTheme.mono(
+                          size: 11,
+                          color: AppColors.accent,
+                          weight: FontWeight.w600,
                         ),
+                      ),
+                      Text(
+                        ' · ',
+                        style: AppTheme.mono(
+                            size: 11, color: AppColors.inkSubtle),
+                      ),
+                      Text(
+                        timeFmt.format(raduno.startAt.toLocal()),
+                        style: AppTheme.mono(
+                            size: 11, color: AppColors.inkMuted),
+                      ),
+                      const Spacer(),
+                      if (raduno.distanceKm != null)
                         Text(
-                          ' · ',
+                          '${raduno.distanceKm!.toStringAsFixed(0)} km',
                           style: AppTheme.mono(
                               size: 11, color: AppColors.inkSubtle),
                         ),
-                        Text(
-                          timeFmt.format(raduno.startAt.toLocal()),
-                          style: AppTheme.mono(
-                              size: 11, color: AppColors.inkMuted),
-                        ),
-                        const Spacer(),
-                        if (raduno.distanceKm != null)
-                          Text(
-                            '${raduno.distanceKm!.toStringAsFixed(0)} km',
-                            style: AppTheme.mono(
-                                size: 11, color: AppColors.inkSubtle),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 3),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
 
-                    // Title
-                    Text(
-                      raduno.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.ink,
-                        height: 1.2,
-                        letterSpacing: -0.2,
-                      ),
+                  // Title — 1 line to keep card compact
+                  Text(
+                    raduno.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ink,
+                      height: 1.2,
+                      letterSpacing: -0.2,
                     ),
-                    const SizedBox(height: 2),
+                  ),
+                  const SizedBox(height: 3),
 
-                    // Location
-                    Text(
-                      raduno.locationName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.inkMuted,
-                      ),
+                  // Location
+                  Text(
+                    raduno.locationName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.inkMuted,
                     ),
+                  ),
+                  const SizedBox(height: 8),
 
-                    const Spacer(),
-
-                    // Bottom: price chip
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: _PriceChip(raduno: raduno),
-                    ),
-                  ],
-                ),
+                  // Bottom: price chip
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: _PriceChip(raduno: raduno),
+                  ),
+                ],
               ),
             ),
           ],

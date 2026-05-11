@@ -61,9 +61,13 @@ class _DetailBody extends ConsumerWidget {
               backgroundColor: Colors.black.withValues(alpha: 0.3),
               child: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => context.canPop()
-                    ? context.pop()
-                    : context.go('/home/raduni'),
+                onPressed: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  } else {
+                    context.go('/home/raduni');
+                  }
+                },
               ),
             ),
           ),

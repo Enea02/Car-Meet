@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,6 +16,7 @@ import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/raduni/presentation/create_raduno_screen.dart';
 import '../../features/raduni/presentation/home_screen.dart';
 import '../../features/raduni/presentation/raduno_detail_screen.dart';
+import '../theme/app_colors.dart';
 
 final GlobalKey<NavigatorState> _rootNavKey = GlobalKey<NavigatorState>();
 
@@ -108,41 +110,177 @@ class AuthRefreshNotifier extends ChangeNotifier {
 class _SplashScreen extends StatelessWidget {
   const _SplashScreen();
   @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: CircularProgressIndicator()));
+  Widget build(BuildContext context) => const Scaffold(
+        backgroundColor: AppColors.bg,
+        body: Center(child: CircularProgressIndicator(color: AppColors.accent)),
+      );
 }
+
+// ─── Shell with pill-shaped bottom nav + center FAB ───────────────────────────
 
 class HomeShell extends StatelessWidget {
   final Widget child;
   const HomeShell({super.key, required this.child});
 
   static const _tabs = [
-    ('/home/raduni', Icons.event, 'Raduni'),
-    ('/home/map', Icons.map_outlined, 'Mappa'),
-    ('/home/garage', Icons.garage_outlined, 'Garage'),
-    ('/home/profile', Icons.person_outline, 'Profilo'),
+    ('/home/raduni', Icons.explore_outlined, Icons.explore, 'Scopri'),
+    ('/home/map', Icons.map_outlined, Icons.map, 'Mappa'),
+    ('/home/garage', Icons.garage_outlined, Icons.garage, 'Garage'),
+    ('/home/profile', Icons.person_outline, Icons.person, 'Profilo'),
   ];
 
-  int _indexFromLocation(String location) {
+  int _indexFor(String loc) {
     for (var i = 0; i < _tabs.length; i++) {
-      if (location.startsWith(_tabs[i].$1)) return i;
+      if (loc.startsWith(_tabs[i].$1)) return i;
     }
     return 0;
   }
 
   @override
   Widget build(BuildContext context) {
-    final location = GoRouterState.of(context).matchedLocation;
-    final index = _indexFromLocation(location);
+    final loc = GoRouterState.of(context).matchedLocation;
+    final idx = _indexFor(loc);
 
     return Scaffold(
+      backgroundColor: AppColors.bg,
       body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: index,
-        onDestinationSelected: (i) => context.go(_tabs[i].$1),
-        destinations: [
-          for (final tab in _tabs)
-            NavigationDestination(icon: Icon(tab.$2), label: tab.$3),
+      bottomNavigationBar: _PillNavBar(
+        selectedIndex: idx,
+        onTabTap: (i) => context.go(_tabs[i].$1),
+        onFabTap: () => context.go('/home/raduni/create'),
+        tabs: _tabs,
+      ),
+    );
+  }
+}
+
+class _PillNavBar extends StatelessWidget {
+  final int selectedIndex;
+  final List<(String, IconData, IconData, String)> tabs;
+  final ValueChanged<int> onTabTap;
+  final VoidCallback onFabTap;
+
+  const _PillNavBar({
+    required this.selectedIndex,
+    required this.tabs,
+    required this.onTabTap,
+    required this.onFabTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bottom = max(MediaQuery.of(context).padding.bottom, 12.0);
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.bg.withValues(alpha: 0),
+            AppColors.bg,
+          ],
+          stops: const [0, 0.35],
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(16, 10, 16, bottom),
+      child: Container(
+        height: 64,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: AppColors.divider),
+          boxShadow: const [
+            BoxShadow(
+              blurRadius: 18,
+              color: Color(0x0F141E19),
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // First 2 tabs
+            for (int i = 0; i < 2; i++)
+              Expanded(
+                child: _NavItem(
+                  icon: tabs[i].$2,
+                  activeIcon: tabs[i].$3,
+                  label: tabs[i].$4,
+                  selected: selectedIndex == i,
+                  onTap: () => onTabTap(i),
+                ),
+              ),
+            // Center FAB
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: GestureDetector(
+                onTap: onFabTap,
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                    color: AppColors.accent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.add, color: Colors.white, size: 24),
+                ),
+              ),
+            ),
+            // Last 2 tabs
+            for (int i = 2; i < 4; i++)
+              Expanded(
+                child: _NavItem(
+                  icon: tabs[i].$2,
+                  activeIcon: tabs[i].$3,
+                  label: tabs[i].$4,
+                  selected: selectedIndex == i,
+                  onTap: () => onTabTap(i),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = selected ? AppColors.accent : AppColors.inkSubtle;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(selected ? activeIcon : icon, color: color, size: 22),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              color: color,
+              fontWeight:
+                  selected ? FontWeight.w600 : FontWeight.w500,
+              letterSpacing: 0,
+            ),
+          ),
         ],
       ),
     );

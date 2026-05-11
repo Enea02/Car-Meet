@@ -2,9 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../core/utils/distance_formatter.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import '../../features/raduni/data/raduno_model.dart';
 
+/// Card orizzontale compatta — replica la variante `compact` del design.
 class RadunoCard extends StatelessWidget {
   final Raduno raduno;
   final VoidCallback? onTap;
@@ -12,92 +14,156 @@ class RadunoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateFmt = DateFormat('EEE d MMM • HH:mm', 'it_IT');
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    final dateFmt = DateFormat('d MMM', 'it_IT');
+    final timeFmt = DateFormat('HH:mm', 'it_IT');
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.divider),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (raduno.coverImageUrl != null)
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: CachedNetworkImage(
-                  imageUrl: raduno.coverImageUrl!,
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(color: Colors.black12),
-                  errorWidget: (_, __, ___) => Container(
-                    color: Colors.black12,
-                    child: const Icon(Icons.broken_image_outlined),
-                  ),
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(raduno.title,
-                      style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_today, size: 14),
-                      const SizedBox(width: 6),
-                      Text(dateFmt.format(raduno.startAt.toLocal())),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(Icons.place_outlined, size: 14),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          raduno.locationName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (raduno.distanceKm != null)
+            // Cover 88×88
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: raduno.coverImageUrl != null
+                  ? CachedNetworkImage(
+                      imageUrl: raduno.coverImageUrl!,
+                      width: 88,
+                      height: 88,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => _imgPlaceholder(),
+                      errorWidget: (_, __, ___) => _imgPlaceholder(),
+                    )
+                  : _imgPlaceholder(),
+            ),
+            const SizedBox(width: 12),
+
+            // Content
+            Expanded(
+              child: SizedBox(
+                height: 88,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Date · time · distance
+                    Row(
+                      children: [
                         Text(
-                          DistanceFormatter.format(raduno.distanceKm!),
-                          style: Theme.of(context).textTheme.labelSmall,
+                          dateFmt.format(raduno.startAt.toLocal()).toUpperCase(),
+                          style: AppTheme.mono(
+                            size: 11,
+                            color: AppColors.accent,
+                            weight: FontWeight.w600,
+                          ),
                         ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: raduno.isFree
-                              ? Colors.green.withValues(alpha: 0.15)
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
-                          borderRadius: BorderRadius.circular(20),
+                        Text(
+                          ' · ',
+                          style: AppTheme.mono(
+                              size: 11, color: AppColors.inkSubtle),
                         ),
-                        child: Text(
-                          raduno.isFree
-                              ? 'Gratuito'
-                              : '${raduno.entryPriceEuro.toStringAsFixed(2)} €',
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelMedium
-                              ?.copyWith(fontWeight: FontWeight.w600),
+                        Text(
+                          timeFmt.format(raduno.startAt.toLocal()),
+                          style: AppTheme.mono(
+                              size: 11, color: AppColors.inkMuted),
                         ),
+                        const Spacer(),
+                        if (raduno.distanceKm != null)
+                          Text(
+                            '${raduno.distanceKm!.toStringAsFixed(0)} km',
+                            style: AppTheme.mono(
+                                size: 11, color: AppColors.inkSubtle),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+
+                    // Title
+                    Text(
+                      raduno.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.ink,
+                        height: 1.2,
+                        letterSpacing: -0.2,
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 2),
+
+                    // Location
+                    Text(
+                      raduno.locationName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.inkMuted,
+                      ),
+                    ),
+
+                    const Spacer(),
+
+                    // Bottom: price chip
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: _PriceChip(raduno: raduno),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _imgPlaceholder() => Container(
+        width: 88,
+        height: 88,
+        color: AppColors.surfaceMuted,
+        child: const Icon(Icons.directions_car_outlined,
+            color: AppColors.inkSubtle, size: 28),
+      );
+}
+
+class _PriceChip extends StatelessWidget {
+  final Raduno raduno;
+  const _PriceChip({required this.raduno});
+
+  @override
+  Widget build(BuildContext context) {
+    final (label, bg, fg) = raduno.isFree
+        ? ('Gratis', AppColors.surfaceMuted, AppColors.inkMuted)
+        : (
+            '€${raduno.entryPriceEuro.toStringAsFixed(0)}',
+            AppColors.surfaceMuted,
+            AppColors.ink
+          );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: fg,
+          letterSpacing: 0.2,
         ),
       ),
     );

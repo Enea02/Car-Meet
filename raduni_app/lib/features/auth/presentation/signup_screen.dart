@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/app_colors.dart';
 import '../providers/auth_providers.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
@@ -46,7 +47,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         context.go('/home/raduni');
       } else {
         setState(() => _info =
-            'Ti abbiamo mandato una mail di conferma. Apri il link per attivare l\'account.');
+            'Ti abbiamo mandato una mail di conferma. Aprila per attivare l\'account.');
       }
     } catch (e) {
       if (mounted) setState(() => _error = e.toString());
@@ -58,80 +59,146 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Crea account')),
+      backgroundColor: AppColors.bg,
+      appBar: AppBar(
+        backgroundColor: AppColors.bg,
+        leading: const BackButton(color: AppColors.ink),
+        elevation: 0,
+      ),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Crea il tuo profilo',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.ink,
+                    letterSpacing: -0.6,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Bastano pochi secondi.',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: AppColors.inkMuted,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // Name
+                TextFormField(
+                  controller: _displayNameCtrl,
+                  decoration:
+                      const InputDecoration(hintText: 'Nome mostrato'),
+                  validator: (v) =>
+                      v == null || v.trim().length < 2
+                          ? 'Troppo corto'
+                          : null,
+                ),
+                const SizedBox(height: 12),
+
+                // Email
+                TextFormField(
+                  controller: _emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration:
+                      const InputDecoration(hintText: 'Email'),
+                  validator: (v) =>
+                      v == null || !v.contains('@')
+                          ? 'Email non valida'
+                          : null,
+                ),
+                const SizedBox(height: 12),
+
+                // Password
+                TextFormField(
+                  controller: _passwordCtrl,
+                  obscureText: true,
+                  decoration:
+                      const InputDecoration(hintText: 'Password'),
+                  validator: (v) =>
+                      v == null || v.length < 6
+                          ? 'Almeno 6 caratteri'
+                          : null,
+                ),
+
+                if (_error != null) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFBECEB),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      _error!,
+                      style: const TextStyle(
+                          color: AppColors.danger, fontSize: 13),
+                    ),
+                  ),
+                ],
+
+                if (_info != null) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE6EEE9),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      _info!,
+                      style: const TextStyle(
+                          color: AppColors.accent, fontSize: 13),
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 24),
+                FilledButton(
+                  onPressed: _loading ? null : _submit,
+                  child: _loading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Text('Crea account'),
+                ),
+                const SizedBox(height: 24),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    TextFormField(
-                      controller: _displayNameCtrl,
-                      decoration: const InputDecoration(
-                        labelText: 'Nome mostrato',
-                        prefixIcon: Icon(Icons.person_outline),
-                      ),
-                      validator: (v) =>
-                          v == null || v.trim().length < 2 ? 'Troppo corto' : null,
+                    const Text(
+                      'Hai già un account?',
+                      style: TextStyle(
+                          color: AppColors.inkMuted, fontSize: 14),
                     ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: _emailCtrl,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email_outlined),
-                      ),
-                      validator: (v) =>
-                          v == null || !v.contains('@') ? 'Email non valida' : null,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: _passwordCtrl,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: Icon(Icons.lock_outline),
-                      ),
-                      validator: (v) =>
-                          v == null || v.length < 6 ? 'Almeno 6 caratteri' : null,
-                    ),
-                    if (_error != null) ...[
-                      const SizedBox(height: 12),
-                      Text(_error!,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.error)),
-                    ],
-                    if (_info != null) ...[
-                      const SizedBox(height: 12),
-                      Text(_info!,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary)),
-                    ],
-                    const SizedBox(height: 24),
-                    FilledButton(
-                      onPressed: _loading ? null : _submit,
-                      child: _loading
-                          ? const SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text('Registrati'),
-                    ),
-                    const SizedBox(height: 12),
                     TextButton(
                       onPressed: () => context.go('/login'),
-                      child: const Text('Hai già un account? Accedi'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.accent,
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 6),
+                      ),
+                      child: const Text('Accedi',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
           ),
         ),
